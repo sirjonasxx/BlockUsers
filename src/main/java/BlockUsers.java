@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 @ExtensionInfo(
         Title =  "Block Users",
         Description =  "Remove users from the game",
-        Version =  "1.0",
+        Version =  "1.0.1",
         Author =  "sirjonasxx"
 )
 public class BlockUsers extends Extension {
@@ -70,7 +70,7 @@ public class BlockUsers extends Extension {
         }
 
         ChatConsole chatConsole = new ChatConsole(this,
-                "Welcome to Block Trollers, the following commands exist: (You may need to reload the room for the changes to take effect)\n" +
+                "Welcome to Block Users, the following commands exist: (You may need to reload the room for the changes to take effect)\n" +
                         "\n" +
                         ":block <user>\n" +
                         ":unblock <user>\n" +
@@ -159,23 +159,22 @@ public class BlockUsers extends Extension {
         HEntity[] users = HEntity.parse(oldPacket);
         List<HEntity> filtered = new ArrayList<>();
         for (HEntity user : users) {
-            if (user.getEntityType() == HEntityType.HABBO) {
-                if (blockedUsers.contains(user.getName().toLowerCase())) {
-                    blockedUserRoomIndexes.add(user.getIndex());
-                    blockedUserIds.put(user.getName().toLowerCase(), user.getId());
-                    if (mode == Mode.GHOST) {
-                        user.setGender(HGender.Male);
-                        user.setName("Ghost");
-                        user.setFigureId(""); // loads as ghost
-                        user.setFavoriteGroup("");
-                        user.setMotto("");
-                        filtered.add(user);
-                    }
-                }
-                else {
+            if (user.getEntityType() == HEntityType.HABBO && blockedUsers.contains(user.getName().toLowerCase())) {
+                blockedUserRoomIndexes.add(user.getIndex());
+                blockedUserIds.put(user.getName().toLowerCase(), user.getId());
+                if (mode == Mode.GHOST) {
+                    user.setGender(HGender.Male);
+                    user.setName("Ghost");
+                    user.setFigureId(""); // loads as ghost
+                    user.setFavoriteGroup("");
+                    user.setMotto("");
                     filtered.add(user);
                 }
             }
+            else {
+                filtered.add(user);
+            }
+
         }
 
         HPacket filteredPacket = HEntity.constructPacket(filtered.toArray(new HEntity[0]), oldPacket.headerId());
